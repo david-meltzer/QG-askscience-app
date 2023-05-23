@@ -1,0 +1,7 @@
+datasets
+torch==1.13
+transformers==4.29.0 
+faiss-cpu
+folium
+altair<5
+openai
