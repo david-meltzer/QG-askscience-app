@@ -16,54 +16,85 @@ def main():
     In addition, the FLAN-T5-XXL model was recently updated on Huggingface and may give buggy outputs.\
     ")
     
+    # First two checkpoints listed are models we fine-tuned on the r/AskScience dataset.
+    # Third model is Google's FLAN-T5-XXL which we did not fine-tune.
     checkpoints = ['dhmeltzer/bart-large_askscience-qg',
               'dhmeltzer/flan-t5-base_askscience-qg',
               'google/flan-t5-xxl']
     
+    # API key for Huggingface
     headers = {"Authorization": f"Bearer {st.secrets['HF_token']}"}
+    # API key for OpenAI
     openai.api_key = st.secrets['OpenAI_token']
     
     def query(checkpoint, payload):
+        """
+        Used to generate a question from a sequence-to-sequence model hosted on Huggingface.
+        
+        Inputs:
+        -------
+        - checkpoint (str): Checkpoint for model hosted on Huggingface.
+        - payload (str): Scientific text used as basis to generate question.
+        
+        Output:
+        -------
+        - response (dict): Dictionary containing the generated question.
+        """
+        
+        # URL of seq2seq model hosted on Huggingface.
         API_URL = f"https://api-inference.huggingface.co/models/{checkpoint}"
         
+        # Standard query for Inference API
         response = requests.post(API_URL, 
                                     headers=headers, 
                                     json=payload)
         
         return response.json()
     
-    # User search
+    # User search with default text included.
     user_input = st.text_area("Question Generator", 
                                 """Black holes are the most gravitationally dense objects in the universe.""")
     
     if user_input:
+        # Query each model in checkpoints list. All models are hosted on Huggingface.
         for checkpoint in checkpoints:
             
             model_name = checkpoint.split('/')[1]
-    
+            
+            # For FLAN models we need to include an instruction-style prompt for the model.
             if 'flan' in model_name.lower():
                 
                 prompt = 'generate a question: ' + user_input
-
+            
+            # For all other models, we only need the user-inputted text.
             else:
                 prompt = user_input
             
             output = query(checkpoint,{
                         "inputs": prompt,
                         "wait_for_model":True})
+            # If Inference API works, then block below extract the generated text.
             try:
                 output=output[0]['generated_text']
+            
+            # If try block fails, we show the user the output of the model.
+            # Try block only fails when Inference API needs more time to load model.
             except:
                 st.write(output)
                 return
             
+            # Write the name of the model as well as its output.
             st.write(f'**{model_name}**: {output}')
-    
+        
+        # Next, query the GPT-3.5-turbo model using the OpenAI API.
         model_engine = "gpt-3.5-turbo"
+        # Limit output to 50 tokens.
         max_tokens = 50
         
+        # GPT-3.5 expects prompt to be in form of an instruction.
         prompt = f"generate a question: {user_input}"
     
+        # Prepare GPT-3.5 model by telling the model it is an assistant which generates questions and then present user-defined prompt.
         response=openai.ChatCompletion.create(
             model=model_engine,
             messages=[
@@ -71,11 +102,10 @@ def main():
                 {"role": "user", "content": prompt},
             ])
     
+        # Extract question from response and print output to reader.
         output = response['choices'][0]['message']['content']
-        
         st.write(f'**{model_engine}**: {output}')
 
         
 if __name__ == "__main__":
     main()
-#[0]['generated_text']
