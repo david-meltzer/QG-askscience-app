@@ -88,8 +88,6 @@ def main():
         
         # Next, query the GPT-3.5-turbo model using the OpenAI API.
         model_engine = "gpt-3.5-turbo"
-        # Limit output to 50 tokens.
-        max_tokens = 50
         
         # GPT-3.5 expects prompt to be in form of an instruction.
         prompt = f"generate a question: {user_input}"
