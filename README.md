@@ -1,16 +1,4 @@
----
-title: Qg Generation
-emoji: 📊
-colorFrom: blue
-colorTo: purple
-sdk: streamlit
-sdk_version: 1.19.0
-app_file: app.py
-pinned: false
----
-
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
-
 This is a question-generating application where the user writes a piece of scientific text and the model outputs questions based on that text.
 At the moment we have fine-tuned the FLAN-T5-Base and BART-Large models on the r/AskScience dataset and also include the zero-shot output from FLAN-T5-XXL and GPT-3.5.
 For more information and to test this application yourself, click <a href="https://huggingface.co/spaces/dhmeltzer/qg_generation">here</a>.
+To read more about the r/AskScience dataset itself and how we created the fine-tuned models, see our Weights and Biases <a href="https://wandb.ai/dmeltzer/Question_Generation/reports/Exploratory-Data-Analysis-for-r-AskScience--Vmlldzo0MjQwODg1?accessToken=fndbu2ar26mlbzqdphvb819847qqth2bxyi4hqhugbnv97607mj01qc7ed35v6w8">report</a> covering exploratory data analysis and our <a href="https://api.wandb.ai/links/dmeltzer/7an677es">report</a> covering the theoretical background behind this project.
